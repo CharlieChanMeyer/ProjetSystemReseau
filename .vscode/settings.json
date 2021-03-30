@@ -1,0 +1,10 @@
+{
+    "C_Cpp.errorSquiggles": "Disabled",
+    "files.associations": {
+        "string_view": "c",
+        "array": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "iostream": "cpp"
+    }
+}
