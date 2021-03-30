@@ -34,20 +34,19 @@ int main(void) {
         }
     }
     //report(monitor);
-    cout << "Entrez 0 pour actualiser le rapport du moniteur : ";
     int val;
+    cout << "Entrez 0 pour actualiser le rapport du moniteur : ";
     cin >> val;
 
+    time_t start, end;
+    start = time(0);
+    
     do {
+        sleep(3);
         report(monitor);
-        cout << "Entrez 0 pour actualiser le rapport du moniteur : ";
-        cin >> val;
-        if (val == 0)
-        {
-            report(monitor);
-        }
         
-    } while (true); 
+             
+    } while (true);
 
     
 }

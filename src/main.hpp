@@ -9,7 +9,7 @@
 #include <string>
 #include <iostream>
 #include <time.h>
-
+#include "monitor.hpp"
 /* define global variable*/
 #define NB_CALCULATOR 3
 #define NB_LISTE 15
