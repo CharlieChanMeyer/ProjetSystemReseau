@@ -11,6 +11,7 @@
 #include <chrono>
 #include <sys/types.h>
 #include "monitor.hpp"
+#include "calculator.hpp"
 /* define global variable*/
 #define NB_CALCULATOR 3
 #define NB_LISTE 15

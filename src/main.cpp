@@ -12,7 +12,7 @@ void static report(clc monitor[]){
     cout << "Nombre de processus : " << NB_CALCULATOR << "\nSomme totale : " << sumTot << endl;
     cout << "\n         Nom    | Somme partielle | Temps d'execution " << endl;
     for (size_t i = 0; i < NB_CALCULATOR; i++) {
-        cout << "       "<<monitor[i].name << " |        " << monitor[i].partialSum  << "        |           " << monitor[i].timeExec << endl;
+        cout << "       "<<monitor[i].name << " |        " << monitor[i].partialSum  << "        |           " << monitor[i].timeExec << " s" << endl;
     }    
 }
 
@@ -33,10 +33,26 @@ int main(void) {
         monitor[i].name = "thread_" +to_string(i);
         monitor[i].partialSum = 0;
         monitor[i].timeExec = 0;
+        cout << monitor[i].name << endl;
         for (size_t j = 0; j < NB_LISTE/NB_CALCULATOR; j++) {
             monitor[i].list[j] = listNb[j+i*NB_LISTE/NB_CALCULATOR];
+            cout << monitor[i].list[j] << endl;
         }
     }
+
+    pthread_t thread;
+    for ( int i = 0; i < NB_CALCULATOR; i++ ) {
+        int *arg = (int *) malloc(sizeof(*arg));
+        if ( arg == NULL ) {
+            fprintf(stderr, "Couldn't allocate memory for thread arg.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        *arg = i;
+        cout << arg << endl;
+        pthread_create(&thread, 0, partialSum, arg);
+    }
+
 
     char name[20];
 	time_t startTime = time(0);
