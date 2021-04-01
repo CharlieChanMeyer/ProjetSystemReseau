@@ -7,5 +7,6 @@
 #include <pthread.h>
 #include <iostream>
 #include <time.h>
+#include "main.hpp"
 
-void *report(void *noUse);
+void *autoReport(void *noUse);

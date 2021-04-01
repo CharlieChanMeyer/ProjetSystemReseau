@@ -21,11 +21,11 @@ all : $(PROG)
 
 #Compile le programme à partir des fichiers objets
 $(PROG) : $(OBJ) 
-	$(CC) -Wall $^ -o $@ -lm
+	$(CC) -Wall $^ -o $@ -lm -lpthread 
 
 #Crée les fichiers objets à partir des fichiers .cpp et .hpp
 $(bindir)%.o : $(srcdir)%.cpp $(srcdir)%.hpp 
-	$(CC) -Wall -std=c++14 -c $< -o $@
+	$(CC) -Wall -std=c++14 -c $< -o $@ -lpthread 
 
 
 .PHONY : clean
