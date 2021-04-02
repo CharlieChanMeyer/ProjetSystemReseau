@@ -49,7 +49,7 @@ void *partialSum(void *arg)
         monitor.sum[offset] = mysum;
         pthread_mutex_unlock (&mutexsum);
         startTimeReport = time(0);
-        if (offset == 2)
+        if ((offset == 2) && (monitor.timeExec[0] < 6))
         {
             loop = false;
         }
@@ -120,18 +120,19 @@ for(i=0;i<NB_CALCULATOR;i++)
     char name[20];
 	time_t startTime = time(0);
     time_t startCalculators = time(0);
+    // time_t startCalculators[NB_CALCULATOR];
+
+    // for (size_t i = 0; i < NB_CALCULATOR; i++)
+    // {
+    //     startCalculators[i] = time(0);
+    // }
+    
+
     void **retval;
-    bool kill = false;
     report(monitor);
 	while( true )
 	{
 		time_t currentTime = time(0) - startTime;
-        if (!kill)
-        {
-            kill = true;
-            int test = pthread_cancel(callThd[2]);
-            cout << callThd[2] << "kill result = " << test << endl;
-        }
         
         
 		if( ((int) currentTime) >= 3 )
