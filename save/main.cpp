@@ -23,35 +23,59 @@ int main(void) {
     struct timeval  timeout;
     int             ready_for_reading = 0;
     int             read_bytes = 0;
+    void            *status;
+    pthread_attr_t  attr;  
 
     int listNb[NB_LISTE]; 
     for (size_t i = 1; i <= NB_LISTE; i++){
         listNb[i-1] = i;
     }
     
-    for (int i = 0; i < NB_CALCULATOR; i++){
+    for (size_t i = 0; i < NB_CALCULATOR; i++){
         monitor[i].name = "thread_" +to_string(i);
         monitor[i].partialSum = 0;
         monitor[i].timeExec = 0;
         cout << monitor[i].name << endl;
+        monitor[i].list = (int*) malloc (NB_LISTE/NB_CALCULATOR*sizeof(int));
         for (size_t j = 0; j < NB_LISTE/NB_CALCULATOR; j++) {
             monitor[i].list[j] = listNb[j+i*NB_LISTE/NB_CALCULATOR];
             cout << monitor[i].list[j] << endl;
         }
     }
-
-    pthread_t thread;
-    for ( int i = 0; i < NB_CALCULATOR; i++ ) {
-        int *arg = (int *) malloc(sizeof(*arg));
-        if ( arg == NULL ) {
-            fprintf(stderr, "Couldn't allocate memory for thread arg.\n");
-            exit(EXIT_FAILURE);
-        }
-
-        *arg = i;
-        cout << arg << endl;
-        pthread_create(&thread, 0, partialSum, arg);
+    cout << "COUCOU" << endl;
+    pthread_mutex_init(&mutexsum, NULL);
+    cout << "BONJOUR" << endl;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+    cout << "HELLO" << endl;
+    for (size_t i = 0; i < NB_CALCULATOR; i++)
+    {
+        cout << "AVANT " << i << endl;
+        pthread_create(&callThd[i], &attr, partialSum, (void *)i);
+        cout << "APRES " << i << endl;
     }
+    cout << "HOLA" << endl;
+
+    pthread_attr_destroy(&attr);
+
+    for(size_t i=0; i<NB_CALCULATOR; i++)
+       {
+       pthread_join(callThd[i], &status);
+       }
+    
+
+    // pthread_t thread;
+    // for ( int i = 0; i < NB_CALCULATOR; i++ ) {
+    //     int *arg = (int *) malloc(sizeof(*arg));
+    //     if ( arg == NULL ) {
+    //         fprintf(stderr, "Couldn't allocate memory for thread arg.\n");
+    //         exit(EXIT_FAILURE);
+    //     }
+
+    //     *arg = i;
+    //     cout << arg << endl;
+    //     pthread_create(&thread, 0, partialSum, arg);
+    // }
 
 
     char name[20];
@@ -124,9 +148,13 @@ int main(void) {
 
 
 	}
-
+    for (size_t i = 0; i < NB_CALCULATOR; i++)
+    {
+        free(monitor[i].list)
+    }
+    
+    pthread_mutex_destroy(&mutexsum);
+    pthread_exit(NULL);
 
 	return 0;
-
-    
 }

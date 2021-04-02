@@ -5,10 +5,6 @@ void *partialSum(void *i) {
     int threadNumber = *((int *) i);
     cout << "Bonjour, je suis le thread " << threadNumber << endl;
     cout << monitor[threadNumber].name << " | " << monitor[threadNumber].timeExec << endl;
-    for (size_t i = 0; i < 5; i++)
-    {
-        cout << monitor[threadNumber].list[i];
-    }
     
     time_t startTimeSum = time(0);
     int partialSum = 0;

@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <iostream>
 #include <time.h>
-#include "main.hpp"
+#include "dotprod_mutex.hpp"
+// #include "main.hpp"
 
 void *partialSum(void *i);

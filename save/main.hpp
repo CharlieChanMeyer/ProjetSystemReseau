@@ -10,7 +10,6 @@
 #include <time.h>
 #include <chrono>
 #include <sys/types.h>
-#include "monitor.hpp"
 #include "calculator.hpp"
 /* define global variable*/
 #define NB_CALCULATOR 3
@@ -20,12 +19,14 @@ using namespace std;
 
 typedef struct Calculator {
     string name;
-    int timeExec;
+    int timeExec[NB_CALCULATOR];
     int partialSum;
-    int list[NB_LISTE/NB_CALCULATOR];
+    int *list;
 } clc;
 
 static clc monitor[NB_CALCULATOR];
+static pthread_t callThd[NB_CALCULATOR];
+static pthread_mutex_t mutexsum;
 
 void static report(clc monitor[]);
 
