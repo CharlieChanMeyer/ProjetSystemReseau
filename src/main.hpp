@@ -3,6 +3,7 @@
 /* include librairies */
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <string>
@@ -15,7 +16,7 @@ using namespace std;
 
 //Define stuct and global variables
 #define NB_CALCULATOR 5
-#define NB_LISTE 10
+#define NB_LISTE 50
 
 typedef struct 
  {

@@ -3,7 +3,7 @@
 using namespace std;
 
 void static report(clc monitor){
-    system("clear");
+    //system("clear");
     int sumTot= 0;
     for (size_t i = 0; i < NB_CALCULATOR ; i++) {
         sumTot += monitor.sum[i];
@@ -24,6 +24,7 @@ void *partialSum(void *arg)
    long offset;
    int mysum, *x;
    offset = (long)arg;
+   bool loop = true;
      
    len = monitor.veclen;
    start = offset*len;
@@ -33,7 +34,7 @@ void *partialSum(void *arg)
   time_t startTimeReport = time(0);
   time_t startTimeSum = time(0);
     int indexSum = start;
-    while( true )
+    while( loop )
 	{
 		time_t currentTimeReport = time(0) - startTimeReport;
         time_t currentTimeSum = time(0) - startTimeSum;
@@ -48,6 +49,11 @@ void *partialSum(void *arg)
         monitor.sum[offset] = mysum;
         pthread_mutex_unlock (&mutexsum);
         startTimeReport = time(0);
+        if (offset == 2)
+        {
+            loop = false;
+        }
+        
 		}
 
         if( ((int) currentTimeSum) >= 1 )
@@ -104,8 +110,6 @@ for(i=0;i<NB_CALCULATOR;i++)
    */
    pthread_create(&callThd[i], &attr, partialSum, (void *)i); 
    }
-
-pthread_attr_destroy(&attr);
 /* Wait on the other threads */
 
 // for(i=0;i<NB_CALCULATOR;i++) {
@@ -116,15 +120,40 @@ pthread_attr_destroy(&attr);
     char name[20];
 	time_t startTime = time(0);
     time_t startCalculators = time(0);
+    void **retval;
+    bool kill = false;
     report(monitor);
 	while( true )
 	{
 		time_t currentTime = time(0) - startTime;
-
+        if (!kill)
+        {
+            kill = true;
+            int test = pthread_cancel(callThd[2]);
+            cout << callThd[2] << "kill result = " << test << endl;
+        }
+        
+        
 		if( ((int) currentTime) >= 3 )
 		{   
             for (int i = 0; i < NB_CALCULATOR; i++){
-                monitor.timeExec[i] = (int) (time(0) - startCalculators);
+                try
+                {
+                    int exist = pthread_tryjoin_np(callThd[i], retval);
+                    if (exist == 16)
+                    {
+                        monitor.timeExec[i] = (int) (time(0) - startCalculators);
+                    } else {
+                        throw i;
+                    }
+                    
+                }
+                catch(int i)
+                {
+                    cout << "Thread " << i << " a plante" << endl;
+                    monitor.timeExec[i] = 0;
+                    pthread_create(&callThd[i], &attr, partialSum, (void *)i);
+                }
             }
 			report(monitor);
 			//Reset the timer.
@@ -168,7 +197,23 @@ pthread_attr_destroy(&attr);
             } else {
                 if (name[0] == '0') {
                     for (int i = 0; i < NB_CALCULATOR; i++){
-                        monitor.timeExec[i] = (int) (time(0) - startCalculators);
+                        try
+                        {
+                            int exist = pthread_tryjoin_np(callThd[i], retval);
+                            if (exist == 16)
+                            {
+                                monitor.timeExec[i] = (int) (time(0) - startCalculators);
+                            } else {
+                                throw i;
+                            }
+                            
+                        }
+                        catch(int i)
+                        {
+                            //cout << "Thread " << i << " a plante" << endl;
+                            monitor.timeExec[i] = 0;
+                            pthread_create(&callThd[i], &attr, partialSum, (void *)i);
+                        }
                     }
                     report(monitor);
                     timeout.tv_usec = 0;
@@ -180,6 +225,7 @@ pthread_attr_destroy(&attr);
 
 
 	}
+pthread_attr_destroy(&attr);
 free (a);
 pthread_mutex_destroy(&mutexsum);
 pthread_exit(NULL);
