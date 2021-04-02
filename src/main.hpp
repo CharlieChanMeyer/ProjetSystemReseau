@@ -15,7 +15,7 @@ using namespace std;
 
 //Define stuct and global variables
 #define NB_CALCULATOR 5
-#define NB_LISTE 100
+#define NB_LISTE 10
 
 typedef struct 
  {

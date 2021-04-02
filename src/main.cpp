@@ -1,4 +1,4 @@
-#include "dotprod_mutex.hpp"
+#include "main.hpp"
 
 using namespace std;
 
@@ -32,7 +32,7 @@ void *partialSum(void *arg)
    mysum = 0;
   time_t startTimeReport = time(0);
   time_t startTimeSum = time(0);
-    int indexSum = 0;
+    int indexSum = start;
     while( true )
 	{
 		time_t currentTimeReport = time(0) - startTimeReport;
