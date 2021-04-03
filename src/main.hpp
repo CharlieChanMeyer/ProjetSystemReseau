@@ -22,11 +22,14 @@ using namespace std;
 typedef struct {
   int      *a;
   int     sum[NB_CALCULATOR]; 
-  int     veclen; 
+  int     veclen;
+  int timeStart[NB_CALCULATOR];
   int timeExec[NB_CALCULATOR];
+  bool loop[NB_CALCULATOR+1];
+  int timeBeforeKill;
 } clc;
 
 
 clc monitor; 
-pthread_t callThd[NB_CALCULATOR];
+pthread_t callThd[NB_CALCULATOR+1];
 pthread_mutex_t mutexsum;

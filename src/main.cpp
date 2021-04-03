@@ -20,9 +20,23 @@ void static report(clc monitor){
     cout << "Nombre de processus : " << NB_CALCULATOR << "\nSomme totale : " << sumTot << endl;
     /* display of each thread report */
     cout << "\n         Nom    | Somme partielle | Temps d'execution " << endl;
+    cout << "-------------------------------------------------------" << endl;
     for (size_t i = 0; i < NB_CALCULATOR; i++) {
-        cout << "       Thread "<< i << " |        " << monitor.sum[i]  << "        |           "   << monitor.timeExec[i] << " s"   << endl;
-    }    
+        if (monitor.loop[i])
+        {
+            cout << "       Thread "<< i << " |        " << monitor.sum[i]  << "        |           "   << monitor.timeExec[i] << " s"   << endl;
+        }
+        else
+        {
+           cout << "       Thread "<< i << " a planter. Redemarrage en cours...   " << endl;
+        }
+        
+    }
+    cout << "-------------------------------------------------------" << endl;
+    cout << "EvilMonkey va kill un thread dans " <<  monitor.timeBeforeKill << " s " << endl;
+    cout << "-------------------------------------------------------" << endl;
+    cout << "Entrez 1 pour actualiser manuellement" << endl;
+    cout << "Entrez 0 pour quitter le programme" << endl;
 }
 
 /* partialSum function
@@ -35,7 +49,6 @@ void *partialSum(void *arg) {
     long offset;
     int mysum, *x;
     offset = (long)arg;
-    bool loop = true;
      
     len = monitor.veclen;
     start = offset*len;
@@ -45,7 +58,7 @@ void *partialSum(void *arg) {
     time_t startTimeReport = time(0);
     time_t startTimeSum = time(0);
     int indexSum = start;
-    while( loop ) {
+    while( monitor.loop[offset] ) {
 	    time_t currentTimeReport = time(0) - startTimeReport;
         time_t currentTimeSum = time(0) - startTimeSum;
 
@@ -58,9 +71,6 @@ void *partialSum(void *arg) {
             monitor.sum[offset] = mysum;
             pthread_mutex_unlock (&mutexsum);
             startTimeReport = time(0);
-            if ((offset == 2) && (monitor.timeExec[0] < 6)){
-                loop = false;
-            }
 		}
 
         if( ((int) currentTimeSum) >= 1 ) {   
@@ -69,6 +79,42 @@ void *partialSum(void *arg) {
               indexSum++;
             }
             startTimeSum = time(0);
+		}
+
+		//Run other code here while not updating.
+    }
+    pthread_exit((void*) 0);
+}
+
+void *evilMonkey(void *arg) { 
+    long offset = (long)arg;
+    time_t startEvilMonkey = time(0);
+    time_t startEvilMonkeyReport = time(0);
+    time_t currentTime,currentTimeReport;
+    int timeToKill = rand() % 100 + 1;
+    int threadToKill;
+    while( monitor.loop[offset] ) {
+	    currentTime = time(0) - startEvilMonkey;
+        currentTimeReport = time(0) - startEvilMonkeyReport;
+        if (((int) currentTimeReport) >= 2)
+        {
+            pthread_mutex_lock (&mutexsum);
+            monitor.timeBeforeKill = timeToKill - (int) currentTime;
+            pthread_mutex_unlock (&mutexsum);
+            startEvilMonkeyReport = time(0);
+        }
+        
+		if( ((int) currentTime) >= timeToKill ){   
+            /*
+            Lock a mutex prior to updating the value in the shared
+            structure, and unlock it upon updating.
+            */
+            threadToKill = rand() % NB_CALCULATOR;
+            pthread_mutex_lock (&mutexsum);
+            monitor.loop[threadToKill] = false;
+            pthread_mutex_unlock (&mutexsum);
+            timeToKill = rand() % 100 + 1;
+            startEvilMonkey = time(0);
 		}
 
 		//Run other code here while not updating.
@@ -100,8 +146,10 @@ int main (int argc, char *argv[]) {
     monitor.a = a; 
     for (i = 0; i < NB_CALCULATOR; i++){
         monitor.sum[i]=0;
+        monitor.loop[i]=true;
+        monitor.timeStart[i] = time(0);
     }
-
+    monitor.loop[NB_CALCULATOR]=true;
 
     pthread_mutex_init(&mutexsum, NULL);
             
@@ -116,46 +164,37 @@ int main (int argc, char *argv[]) {
         */
         pthread_create(&callThd[i], &attr, partialSum, (void *)i); 
     }
-    /* Wait on the other threads */
-
-    // for(i=0;i<NB_CALCULATOR;i++) {
-    //   pthread_join(callThd[i], &status);
-    //   }
-    /* After joining, print out the results and cleanup */
+    pthread_create(&callThd[NB_CALCULATOR], NULL , evilMonkey, (void *) i); 
 
     char name[20];
 	time_t startTime = time(0);
-    time_t startCalculators = time(0);
-    // time_t startCalculators[NB_CALCULATOR];
-
-    // for (size_t i = 0; i < NB_CALCULATOR; i++)
-    // {
-    //     startCalculators[i] = time(0);
-    // }
-    
 
     void **retval;
     report(monitor);
-	while( true ) {
+    bool monitorLoop = true;
+	while( monitorLoop ) {
 		
         time_t currentTime = time(0) - startTime;
         
-		if( ((int) currentTime) >= 3 ) {   
-            for (int i = 0; i < NB_CALCULATOR; i++){
+		if( ((int) currentTime) >= 3 ) {
+            
+            for (i = 0; i < NB_CALCULATOR; i++){
                 try
                 {
                     int exist = pthread_tryjoin_np(callThd[i], retval);
                     if (exist == 16) {
-                        monitor.timeExec[i] = (int) (time(0) - startCalculators);
+                        monitor.timeExec[i] = (int) (time(0) - monitor.timeStart[i]);
                     } else {
                         throw i;
                     }
                     
                 }
-                catch(int i)
+                catch(long i)
                 {
-                    cout << "Thread " << i << " a plante" << endl;
                     monitor.timeExec[i] = 0;
+                    monitor.timeStart[i] = time(0);
+                    monitor.sum[i] = 0;
+                    monitor.loop[i] = true;
                     pthread_create(&callThd[i], &attr, partialSum, (void *)i);
                 }
             }
@@ -199,28 +238,37 @@ int main (int argc, char *argv[]) {
                 printf("You just hit enter\n");
                 timeout.tv_usec = 0;
             } else {
-                if (name[0] == '0') {
-                    for (int i = 0; i < NB_CALCULATOR; i++){
+                if (name[0] == '1') {
+                    for (i = 0; i < NB_CALCULATOR; i++){
                         try
                         {
                             int exist = pthread_tryjoin_np(callThd[i], retval);
                             if (exist == 16)
                             {
-                                monitor.timeExec[i] = (int) (time(0) - startCalculators);
+                                monitor.timeExec[i] = (int) (time(0) - monitor.timeStart[i]);
                             } else {
                                 throw i;
                             }
                             
                         }
-                        catch(int i)
+                        catch(long i)
                         {
-                            //cout << "Thread " << i << " a plante" << endl;
                             monitor.timeExec[i] = 0;
+                            monitor.loop[i] = true;
+                            monitor.sum[i] = 0;
+                            monitor.timeStart[i] = time(0);
                             pthread_create(&callThd[i], &attr, partialSum, (void *)i);
                         }
                     }
                     report(monitor);
                     timeout.tv_usec = 0;
+                } else if (name[0] == '0') {
+                    for (i = 0; i < NB_CALCULATOR; i++)
+                    {
+                        monitor.loop[i] = false;
+                    }
+                    monitorLoop = false;
+                    monitor.loop[NB_CALCULATOR] = false;
                 }
             }
         } else {
