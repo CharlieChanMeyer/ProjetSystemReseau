@@ -1,10 +1,13 @@
-Projet Programmation système et résaux :
+Projet Programmation système et résaux
 
-******************************************************************************************************
+********************************************************************************************************
 Pour compiler le programme, ouvrez un terminal dans le dossier du projet et taper la commande suivante :
 	make
 Pour l'exécuter, il faut entrer la commande suivante :
 	./prog
-******************************************************************************************************
+********************************************************************************************************
 
-Le monitor affiche un rapport toutes les 3secondes, pour actualiser manuellement le rapport du moniteur il faut entrer 1 dans le terminal. Pour arreter le programme taper 0.
+Le monitor affiche un rapport toutes les 3secondes.
+Un message préviens la "venue" de l'evil monkey. "Evil monkey va kill un thread dans x secondes."
+Pour actualiser manuellement le rapport du moniteur il faut entrer 1 dans le terminal.
+Pour arreter le programme taper 0.
