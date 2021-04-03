@@ -1,0 +1,10 @@
+Projet Programmation système et résaux :
+
+******************************************************************************************************
+Pour compiler le programme, ouvrez un terminal dans le dossier du projet et taper la commande suivante :
+	make
+Pour l'exécuter, il faut entrer la commande suivante :
+	./prog
+******************************************************************************************************
+
+Le monitor affiche un rapport toutes les 3secondes, pour actualiser manuellement le rapport du moniteur il faut entrer 1 dans le terminal. Pour arreter le programme taper 0.
