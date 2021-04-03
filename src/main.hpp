@@ -18,14 +18,15 @@ using namespace std;
 #define NB_CALCULATOR 5
 #define NB_LISTE 50
 
-typedef struct 
- {
-   int      *a;
-   int     sum[NB_CALCULATOR]; 
-   int     veclen; 
-   int timeExec[NB_CALCULATOR];
- } clc;
+/* monitor */
+typedef struct {
+  int      *a;
+  int     sum[NB_CALCULATOR]; 
+  int     veclen; 
+  int timeExec[NB_CALCULATOR];
+} clc;
 
-   clc monitor; 
-   pthread_t callThd[NB_CALCULATOR];
-   pthread_mutex_t mutexsum;
+
+clc monitor; 
+pthread_t callThd[NB_CALCULATOR];
+pthread_mutex_t mutexsum;
