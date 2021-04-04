@@ -214,7 +214,7 @@ int main (int argc, char *argv[]) {
     void **retval;
     /* does monitor report (report of total partial sum and calculator thread [+evil monkey thread too])  */
     report(monitor);
-    /* monitorLoop for report every 2second and request from terminal input*/
+    /* monitorLoop for report every 3second and request from terminal input*/
     bool monitorLoop = true;
     /* monitor loop*/
 	while( monitorLoop ) {
