@@ -212,7 +212,7 @@ int main (int argc, char *argv[]) {
     char name[20];
 	time_t startTime = time(0);
 
-    void **retval;
+    void **retval = 0;
     /* does monitor report (report of total partial sum and calculator thread [+evil monkey thread too])  */
     report(monitor);
     /* monitorLoop for report every 3second and request from terminal input*/
