@@ -160,11 +160,12 @@ void *evilMonkey(void *arg) {
     pthread_exit((void*) 0);
 }
 
-/* main function 
+/* main function (monitor function)
  * start the program
  * create list of number a
  */
 int main (int argc, char *argv[]) {
+    //Initialize variables
     fd_set          input_set;
     struct timeval  timeout;
     int             ready_for_reading = 0;
@@ -270,18 +271,22 @@ int main (int argc, char *argv[]) {
         * Fourth is timeout
         */
 
+        //If input return error
         if (ready_for_reading == -1) {
             /* Some error has occured in input */
             printf("Unable to read your input\n");
             return -1;
         } 
-
+        //If Input
         if (ready_for_reading) {
+            //Read Input
             read_bytes = read(0, name, 19);
+            //If Input is a return
             if(name[read_bytes-1]=='\n'){
                 --read_bytes;
                 name[read_bytes]='\0';
             }
+            //If input is empty
             if(read_bytes==0){
                 printf("You just hit enter\n");
                 timeout.tv_usec = 0;

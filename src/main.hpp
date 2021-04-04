@@ -15,21 +15,21 @@
 using namespace std;
 
 //Define stuct and global variables
-#define NB_CALCULATOR 5
-#define NB_LISTE 50
+#define NB_CALCULATOR 5 //Number of calculator threads
+#define NB_LISTE 50     //Number of integer to Sum in each thread
 
 /* monitor */
 typedef struct {
-  int      *a;
-  int     sum[NB_CALCULATOR]; 
-  int     veclen;
-  int timeStart[NB_CALCULATOR];
-  int timeExec[NB_CALCULATOR];
-  bool loop[NB_CALCULATOR+1];
-  int timeBeforeKill;
+  int      *a;                  //List of int to sum
+  int     sum[NB_CALCULATOR];   //List of partialSum
+  int     veclen;               //Size of vector to sum
+  int timeStart[NB_CALCULATOR]; //List of threads start time 
+  int timeExec[NB_CALCULATOR];  //List of threads execution time
+  bool loop[NB_CALCULATOR+1];   //+1 with EvilMonkey
+  int timeBeforeKill;           //Time before EvilMonkey action
 } clc;
 
 
 clc monitor; 
-pthread_t callThd[NB_CALCULATOR+1];
+pthread_t callThd[NB_CALCULATOR+1];   //+1 with EvilMonkey
 pthread_mutex_t mutexsum;
